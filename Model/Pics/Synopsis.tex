@@ -1,0 +1,272 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{multirow}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Active Suspension System}
+\lhead{Systems Simulation Laboratory}
+\rfoot{Page \thepage}
+
+% Title formatting
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    % \includegraphics[width=0.3\textwidth]{logo.png}\\[1cm]
+    
+    {\LARGE\bfseries ELECTRICAL \& ELECTRONICS ENGINEERING\\[0.3cm]}
+    {\Large Manipal Institute of Technology\\[0.5cm]}
+    {\large Manipal - 576104\\[1cm]}
+    
+    \rule{\linewidth}{0.5mm}\\[0.4cm]
+    {\huge\bfseries ACTIVE SUSPENSION SYSTEM\\[0.2cm]
+    Design and Performance Analysis\\[0.4cm]}
+    \rule{\linewidth}{0.5mm}\\[1.5cm]
+    
+    {\Large\textbf{Systems Simulation Laboratory}\\[0.2cm]
+    ELE 3142\\[0.5cm]}
+    
+    {\large 5th Semester B.Tech. (E \& E Engineering)\\[1.5cm]}
+    
+    % Team Members Table
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|l|c|c|}
+    \hline
+    \textbf{S.No} & \textbf{Name} & \textbf{Registration No.} & \textbf{Roll No.} \\ \hline
+    1 & Gonugondla Veera Manikanta & 230906450 & 54 \\ \hline
+    2 & Rounak Pradhan & 230906492 & 60 \\ \hline
+    \end{tabular}
+    \end{table}
+    
+    \vfill
+    
+    {\large\bfseries PROJECT SYNOPSIS}\\[0.5cm]
+    {\large July -- December 2025}
+    
+\end{titlepage}
+
+% Synopsis Content
+\newpage
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+
+This project presents the design, analysis, and simulation of an active suspension system for automotive applications using a quarter-car model. A Proportional-Integral-Derivative (PID) controller was designed to actively control suspension forces, achieving significant improvements in ride comfort and handling characteristics. Comprehensive frequency and time domain analysis demonstrates that the active suspension system achieves a peak magnitude reduction of \SI{15.24}{dB} compared to the passive system, translating to an 82\% reduction in vibration amplitude. Time domain simulations show 50\% reduction in peak body acceleration and 62.5\% faster settling time, validating the effectiveness of active control strategies in enhancing vehicle suspension performance.
+
+\textbf{Keywords:} Active suspension, PID control, Quarter-car model, MATLAB/Simulink, Frequency response analysis
+
+\section{Introduction and Objectives}
+
+\subsection{Project Overview}
+Vehicle suspension systems are critical for passenger comfort, vehicle stability, and road handling. While traditional passive suspension systems use fixed spring-damper characteristics, active suspension systems incorporate actuators and control systems that can adapt to varying road conditions in real-time. This project develops and evaluates an active suspension system using PID control for a quarter-car model.
+
+\subsection{Key Objectives}
+\begin{enumerate}
+    \item Develop a mathematical model of a quarter-car suspension system using transfer functions and state-space representations
+    \item Design a PID controller for active suspension control with velocity feedback
+    \item Implement the system in MATLAB/Simulink environment
+    \item Perform comprehensive frequency and time domain analysis
+    \item Compare performance metrics between passive and active suspension configurations
+\end{enumerate}
+
+\section{System Model and Parameters}
+
+\subsection{Quarter-Car Model}
+The quarter-car model represents the vertical dynamics of one corner of a vehicle, consisting of:
+\begin{itemize}
+    \item \textbf{Sprung mass ($m_s$):} Vehicle body (\SI{300}{kg})
+    \item \textbf{Unsprung mass ($m_{us}$):} Wheel assembly (\SI{40}{kg})
+    \item \textbf{Suspension spring/damper:} $k_s = \SI{18000}{N/m}$, $c_s = \SI{1200}{N.s/m}$
+    \item \textbf{Tire spring/damper:} $k_t = \SI{195000}{N/m}$, $c_t = \SI{75}{N.s/m}$
+    \item \textbf{Active control force:} $F_c$ (variable, limited to Â±5000 N)
+\end{itemize}
+
+\subsection{Mathematical Representation}
+The system dynamics are governed by Newton's second law applied to both masses:
+
+\textbf{Sprung mass equation:}
+\begin{equation}
+    m_s \ddot{x}_s = -k_s(x_s - x_{us}) - c_s(\dot{x}_s - \dot{x}_{us}) + F_c
+\end{equation}
+
+\textbf{Unsprung mass equation:}
+\begin{equation}
+    m_{us} \ddot{x}_{us} = k_s(x_s - x_{us}) + c_s(\dot{x}_s - \dot{x}_{us}) - k_t(x_{us} - x_r) - c_t(\dot{x}_{us} - \dot{x}_r) - F_c
+\end{equation}
+
+where $x_s$, $x_{us}$, and $x_r$ represent sprung mass, unsprung mass, and road profile displacements respectively.
+
+\section{Controller Design}
+
+\subsection{PID Control Strategy}
+The active suspension employs a PID controller with velocity feedback. The control force is generated based on the error between desired (zero) and actual body velocity:
+
+\begin{equation}
+    F_c(s) = C_{PID}(s) \cdot \left( 0 - s \cdot X_s(s) \right)
+\end{equation}
+
+The PID controller structure with derivative filter is:
+\begin{equation}
+    C_{PID}(s) = K_p + \frac{K_i}{s} + \frac{K_d N s}{s + N}
+\end{equation}
+
+\subsection{Controller Gains}
+Through iterative tuning to optimize performance while maintaining stability, the following gains were selected:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\ \midrule
+Proportional gain, $K_p$ & 5,000 \\
+Integral gain, $K_i$ & 100 \\
+Derivative gain, $K_d$ & 2,000 \\
+Filter coefficient, $N$ & 100 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Implementation and Methodology}
+
+The system was implemented in MATLAB/Simulink with modular subsystems including:
+\begin{itemize}
+    \item Road input generation (step, sinusoidal, random)
+    \item Tire and suspension dynamics blocks
+    \item Mass dynamics with double integration
+    \item PID controller with saturation and rate limiting
+    \item Data acquisition and visualization
+\end{itemize}
+
+Analysis methods included:
+\begin{itemize}
+    \item Bode plot analysis for frequency response characterization
+    \item Time-domain simulations for step and sinusoidal road inputs
+    \item Performance metrics calculation (acceleration, settling time, suspension travel)
+\end{itemize}
+
+\section{Results and Performance Analysis}
+
+\subsection{Frequency Domain Results}
+Bode plot analysis revealed significant improvements in the active system:
+
+\begin{table}[H]
+\centering
+\caption{Frequency response comparison}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Metric} & \textbf{Passive} & \textbf{Active} \\ \midrule
+Peak magnitude (dB) & 5.98 & $-9.26$ \\
+Peak frequency (Hz) & 1.21 & 1.34 \\
+Magnitude improvement (dB) & -- & 15.24 \\
+Amplitude reduction (\%) & -- & 82.0 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+The \SI{15.24}{dB} peak reduction demonstrates superior vibration isolation across the critical frequency range (0.5-10 Hz) covering typical road disturbances.
+
+\subsection{Time Domain Results}
+Step input simulations demonstrated substantial improvements:
+
+\begin{table}[H]
+\centering
+\caption{Time domain performance metrics}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Metric} & \textbf{Passive} & \textbf{Active} \\ \midrule
+Peak body acceleration (m/sÂ²) & 12.0 & 6.0 \\
+Acceleration reduction (\%) & -- & 50.0 \\
+Settling time (s) & 4.0 & 1.5 \\
+Settling time reduction (\%) & -- & 62.5 \\
+Maximum suspension travel (m) & 0.08 & 0.05 \\
+Travel reduction (\%) & -- & 37.5 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Key Observations}
+\begin{itemize}
+    \item \textbf{Vibration Suppression:} 82\% reduction in vibration amplitude significantly improves passenger comfort
+    \item \textbf{Transient Response:} 62.5\% faster settling eliminates sustained oscillations
+    \item \textbf{Body Acceleration:} 50\% reduction directly enhances ride quality
+    \item \textbf{Suspension Utilization:} 37.5\% reduction in travel improves stroke efficiency
+    \item \textbf{Stability:} System remains stable with adequate gain and phase margins
+\end{itemize}
+
+\section{Conclusions and Future Work}
+
+\subsection{Key Achievements}
+This project successfully demonstrated:
+\begin{enumerate}
+    \item Effective mathematical modeling of quarter-car suspension dynamics
+    \item PID controller design achieving substantial performance improvements
+    \item Comprehensive validation through frequency and time domain analysis
+    \item Practical implementation in MATLAB/Simulink environment
+\end{enumerate}
+
+The quantitative results validate that active suspension with PID control provides:
+\begin{itemize}
+    \item Superior vibration isolation (82\% amplitude reduction)
+    \item Enhanced passenger comfort (50\% lower peak acceleration)
+    \item Faster disturbance rejection (62.5\% settling time reduction)
+    \item Better suspension utilization (37.5\% travel reduction)
+\end{itemize}
+
+\subsection{Practical Implications}
+The achieved improvements would translate to noticeably better ride comfort and handling in real-world driving conditions. The modular Simulink implementation provides an excellent platform for exploring advanced control strategies and system enhancements.
+
+\subsection{Future Extensions}
+Potential areas for further development include:
+\begin{itemize}
+    \item Advanced control strategies (LQR, MPC, adaptive control, H-infinity)
+    \item Full vehicle (7-DOF) model with pitch and roll dynamics
+    \item Hardware-in-the-loop testing and experimental validation
+    \item Semi-active solutions using magnetorheological dampers
+    \item Preview control using forward-looking sensors
+\end{itemize}
+
+\subsection{Learning Outcomes}
+This project provided hands-on experience with:
+\begin{itemize}
+    \item Mathematical modeling of complex mechanical systems
+    \item Controller design, tuning, and performance evaluation
+    \item MATLAB/Simulink simulation and analysis
+    \item Frequency and time domain analysis techniques
+    \item Technical documentation and scientific report writing
+\end{itemize}
+
+\section*{Acknowledgments}
+\addcontentsline{toc}{section}{Acknowledgments}
+
+We express our sincere gratitude to our course instructor and the Department of Electrical \& Electronics Engineering, Manipal Institute of Technology, for providing guidance, resources, and laboratory facilities. Special thanks to the Systems Simulation Laboratory staff for their assistance with MATLAB/Simulink implementation.
+
+\vfill
+
+\section*{References}
+\addcontentsline{toc}{section}{References}
+
+\begin{enumerate}
+    \item Norman S. Nise, \textit{Control Systems Engineering}, 8th Edition, Wiley, 2019.
+    \item Rajesh Rajamani, \textit{Vehicle Dynamics and Control}, 2nd Edition, Springer, 2012.
+    \item Katsuhiko Ogata, \textit{Modern Control Engineering}, 5th Edition, Prentice Hall, 2010.
+    \item D. Hrovat, "Survey of Advanced Suspension Developments and Related Optimal Control Applications," \textit{Automatica}, vol. 33, no. 10, pp. 1781-1817, 1997.
+    \item MATLAB Documentation, \textit{Control System Toolbox and Simulink User's Guide}, MathWorks, 2025.
+\end{enumerate}
+
+\end{document}

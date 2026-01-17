@@ -1,0 +1,7 @@
+\beamer@sectionintoc {1}{Introduction}{3}{0}{1}
+\beamer@sectionintoc {2}{Our System Model}{5}{0}{2}
+\beamer@sectionintoc {3}{Transfer Function Derivation}{8}{0}{3}
+\beamer@sectionintoc {4}{Designing Our PID Controller}{10}{0}{4}
+\beamer@sectionintoc {5}{Calculating Performance}{14}{0}{5}
+\beamer@sectionintoc {6}{Our Simulation Results}{17}{0}{6}
+\beamer@sectionintoc {7}{What We Learned}{22}{0}{7}
